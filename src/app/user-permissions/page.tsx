@@ -1,20 +1,33 @@
-"use client";
-
-import React from 'react';
+import React, { Suspense } from 'react';
 import MainLayout from '@/layout/MainLayout';
-import UserPermissionsContainer from '@/components/user-permissions/UserPermissionsContainer';
-import { useSearchParams } from 'next/navigation';
 
-const UserPermissionsPage: React.FC = () => {
-  const searchParams = useSearchParams();
-  const tenantId = searchParams.get('tenant');
-  const tab = searchParams.get('tab');
+// 直接导入客户端组件
+import UserPermissionsContainer from '@/components/user-permissions/UserPermissionsContainer';
+
+// 加载状态组件
+const LoadingFallback = () => (
+  <div style={{ 
+    display: 'flex', 
+    justifyContent: 'center', 
+    alignItems: 'center', 
+    minHeight: '500px' 
+  }}>
+    <div>加载中...</div>
+  </div>
+);
+
+export default function UserPermissionsPage({
+  searchParams,
+}: {
+  searchParams: { tenant?: string; tab?: string };
+}) {
+  const tenantId = searchParams.tenant || null;
   
   return (
     <MainLayout>
-      <UserPermissionsContainer tenantId={tenantId} />
+      <Suspense fallback={<LoadingFallback />}>
+        <UserPermissionsContainer tenantId={tenantId} />
+      </Suspense>
     </MainLayout>
   );
-};
-
-export default UserPermissionsPage; 
+} 

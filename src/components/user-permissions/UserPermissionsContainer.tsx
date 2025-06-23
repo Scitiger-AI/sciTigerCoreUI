@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import { Tabs, Card, Typography, Spin, Alert } from 'antd';
+import { Tabs, Card, Typography, Spin } from 'antd';
 import { css } from '@emotion/css';
 import UserManagement from './UserManagement';
 import RoleManagement from './RoleManagement';
@@ -11,7 +11,6 @@ import { TeamOutlined, IdcardOutlined, SafetyOutlined, KeyOutlined } from '@ant-
 import { useRouter, useSearchParams } from 'next/navigation';
 
 const { Title, Text } = Typography;
-const { TabPane } = Tabs;
 
 interface UserPermissionsContainerProps {
   tenantId?: string | null;
@@ -48,40 +47,40 @@ const UserPermissionsContainer: React.FC<UserPermissionsContainerProps> = ({ ten
     {
       key: 'users',
       label: (
-        <span>
+        <div>
           <TeamOutlined />
           用户管理
-        </span>
+        </div>
       ),
       children: <UserManagement tenantId={tenantId} />
     },
     {
       key: 'roles',
       label: (
-        <span>
+        <div>
           <IdcardOutlined />
           角色管理
-        </span>
+        </div>
       ),
       children: <RoleManagement tenantId={tenantId} />
     },
     {
       key: 'permissions',
       label: (
-        <span>
+        <div>
           <SafetyOutlined />
           权限管理
-        </span>
+        </div>
       ),
       children: <PermissionManagement tenantId={tenantId} />
     },
     {
       key: 'apikeys',
       label: (
-        <span>
+        <div>
           <KeyOutlined />
           API密钥管理
-        </span>
+        </div>
       ),
       children: <ApiKeyManagement tenantId={tenantId} />
     }
@@ -89,8 +88,6 @@ const UserPermissionsContainer: React.FC<UserPermissionsContainerProps> = ({ ten
   
   return (
     <div className={css`padding: 24px;`}>
-     
-      
       <Card
         variant="borderless"
         className={css`
