@@ -223,7 +223,7 @@ function LoginContent() {
         </div>
 
         {/* 显示需登录访问的提示信息 */}
-        {redirectPath && (
+        {redirectPath && redirectPath !== '/' && (
           <Alert
             message={`登录后将跳转到：${redirectDisplay}`}
             type="info"

@@ -16,7 +16,8 @@ import {
   Tooltip,
   Dropdown,
   Menu,
-  Badge
+  Badge,
+  App
 } from 'antd';
 import { 
   SearchOutlined, 
@@ -28,12 +29,12 @@ import {
   SafetyOutlined,
   TeamOutlined,
   AppstoreOutlined,
-  FilterOutlined
+  FilterOutlined,
+  ImportOutlined
 } from '@ant-design/icons';
 import { css } from '@emotion/css';
-import { getPermissions, createPermission, updatePermission, deletePermission } from '@/services/permission';
+import { getPermissions, createPermission, updatePermission, deletePermission, importDefaultPermissions } from '@/services/permission';
 import { Permission } from '@/types/permission';
-import { App } from 'antd';
 import PermissionFormModal from './permission/PermissionFormModal';
 
 interface PermissionManagementProps {
@@ -60,6 +61,7 @@ const PermissionManagement: React.FC<PermissionManagementProps> = ({ tenantId })
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
   const [permissionFormVisible, setPermissionFormVisible] = useState<boolean>(false);
   const [editingPermission, setEditingPermission] = useState<Permission | null>(null);
+  const [importingPermissions, setImportingPermissions] = useState<boolean>(false);
   const { message: messageApi, modal } = App.useApp();
   
   // 获取权限列表
@@ -172,6 +174,29 @@ const PermissionManagement: React.FC<PermissionManagementProps> = ({ tenantId })
       messageApi.error(`删除权限失败: ${error.message || '未知错误'}`);
       console.error('删除权限失败:', error);
     }
+  };
+  
+  // 导入默认权限
+  const handleImportDefaultPermissions = async () => {
+    modal.confirm({
+      title: '导入默认权限',
+      content: '确定要导入系统预设的默认权限吗？已存在的权限将不会被覆盖。',
+      okText: '确定',
+      cancelText: '取消',
+      onOk: async () => {
+        setImportingPermissions(true);
+        try {
+          const result = await importDefaultPermissions();
+          messageApi.success(`导入成功！新增权限: ${result.created}, 已存在: ${result.existed}, 失败: ${result.failed}`);
+          fetchPermissions();
+        } catch (error: any) {
+          messageApi.error(`导入失败: ${error.message || '未知错误'}`);
+          console.error('导入默认权限失败:', error);
+        } finally {
+          setImportingPermissions(false);
+        }
+      }
+    });
   };
   
   // 格式化权限代码显示
@@ -363,9 +388,22 @@ const PermissionManagement: React.FC<PermissionManagementProps> = ({ tenantId })
     <div>
       <div className={css`
         display: flex;
-        justify-content: flex-end;
+        justify-content: space-between;
         margin-bottom: 16px;
       `}>
+        <Space>
+          {showCreateButton && (
+            <Button
+              type="primary"
+              icon={<ImportOutlined />}
+              onClick={handleImportDefaultPermissions}
+              loading={importingPermissions}
+            >
+              导入默认权限
+            </Button>
+          )}
+        </Space>
+        
         <Space size="middle">
           {showCreateButton && (
             <Button 

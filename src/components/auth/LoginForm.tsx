@@ -166,7 +166,7 @@ export const LoginForm: React.FC = () => {
               `} 
             />
           }
-          placeholder="用户名"
+          placeholder="邮箱"
           autoComplete="username"
           onFocus={() => handleFocus('username')}
           onBlur={handleBlur}

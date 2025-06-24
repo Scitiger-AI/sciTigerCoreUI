@@ -4,7 +4,6 @@ import { STORAGE_KEYS } from '@/constants/api';
 
 // 不需要登录就能访问的路径
 const publicPaths = [
-  '/',
   '/privacy',
   '/activate',
   '/terms',

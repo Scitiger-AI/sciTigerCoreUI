@@ -16,12 +16,15 @@ const LoadingFallback = () => (
   </div>
 );
 
-export default function UserPermissionsPage({
+// 将页面组件标记为异步
+export default async function UserPermissionsPage({
   searchParams,
 }: {
   searchParams: { tenant?: string; tab?: string };
 }) {
-  const tenantId = searchParams.tenant || null;
+  // 在 Next.js 15 中，searchParams 对象的属性需要使用 await 获取
+  const { tenant } = await searchParams;
+  const tenantId = tenant || null;
   
   return (
     <MainLayout>

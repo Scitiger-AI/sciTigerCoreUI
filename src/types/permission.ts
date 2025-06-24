@@ -19,6 +19,15 @@ export interface PermissionResponse extends ApiResponse<Permission> {}
 
 export interface PermissionListResponse extends ApiResponse<PaginatedData<Permission>> {}
 
+// 导入默认权限响应
+export interface ImportDefaultResponse {
+  created: number;
+  existed: number;
+  failed: number;
+}
+
+export interface ImportDefaultPermissionResponse extends ApiResponse<ImportDefaultResponse> {}
+
 export interface PermissionCreateParams {
   name: string;
   service: string;

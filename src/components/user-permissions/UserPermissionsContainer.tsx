@@ -7,7 +7,8 @@ import UserManagement from './UserManagement';
 import RoleManagement from './RoleManagement';
 import PermissionManagement from './PermissionManagement';
 import ApiKeyManagement from './ApiKeyManagement';
-import { TeamOutlined, IdcardOutlined, SafetyOutlined, KeyOutlined } from '@ant-design/icons';
+import ServiceScopeManagement from './ServiceScopeManagement';
+import { TeamOutlined, IdcardOutlined, SafetyOutlined, KeyOutlined, AppstoreOutlined } from '@ant-design/icons';
 import { useRouter, useSearchParams } from 'next/navigation';
 
 const { Title, Text } = Typography;
@@ -25,7 +26,7 @@ const UserPermissionsContainer: React.FC<UserPermissionsContainerProps> = ({ ten
   // 从URL查询参数中获取当前激活的标签页
   useEffect(() => {
     const tabParam = searchParams.get('tab');
-    if (tabParam && ['users', 'roles', 'permissions', 'apikeys'].includes(tabParam)) {
+    if (tabParam && ['users', 'roles', 'permissions', 'apikeys', 'servicescopes'].includes(tabParam)) {
       setActiveTab(tabParam);
     }
   }, [searchParams]);
@@ -83,6 +84,16 @@ const UserPermissionsContainer: React.FC<UserPermissionsContainerProps> = ({ ten
         </div>
       ),
       children: <ApiKeyManagement tenantId={tenantId} />
+    },
+    {
+      key: 'servicescopes',
+      label: (
+        <div>
+          <AppstoreOutlined />
+          服务范围管理
+        </div>
+      ),
+      children: <ServiceScopeManagement tenantId={tenantId} />
     }
   ];
   

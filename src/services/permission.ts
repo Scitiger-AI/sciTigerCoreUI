@@ -3,7 +3,7 @@
 import http from '@/utils/http';
 import { API_ENDPOINTS } from '@/constants/api';
 import { ApiResponse, PaginatedData } from '@/types/api';
-import { Permission, PermissionCreateParams, PermissionUpdateParams } from '@/types/permission';
+import { Permission, PermissionCreateParams, PermissionUpdateParams, ImportDefaultPermissionResponse, ImportDefaultResponse } from '@/types/permission';
 
 interface PermissionQueryParams {
   name?: string;
@@ -177,6 +177,27 @@ export const deletePermission = async (permissionId: string): Promise<boolean> =
     }
   } catch (error: any) {
     console.error('删除权限失败:', error);
+    throw error;
+  }
+};
+
+/**
+ * 导入默认权限
+ * @returns 导入结果
+ */
+export const importDefaultPermissions = async (): Promise<ImportDefaultResponse> => {
+  try {
+    const url = API_ENDPOINTS.PERMISSION.IMPORT_DEFAULT;
+    const response = await http.post<ImportDefaultPermissionResponse>(url);
+    const { success, results, message } = response.data;
+    
+    if (success && results) {
+      return results;
+    } else {
+      throw new Error(message || '导入默认权限失败');
+    }
+  } catch (error: any) {
+    console.error('导入默认权限失败:', error);
     throw error;
   }
 }; 

@@ -135,11 +135,11 @@ const TenantCreateModal: React.FC<TenantCreateModalProps> = ({
           label="子域名"
           rules={[
             { required: true, message: '请输入子域名' },
-            { pattern: /^[a-z0-9-]+$/, message: '子域名只能包含小写字母、数字和连字符' },
+            { pattern: /^[a-zA-Z0-9][-a-zA-Z0-9.]*\.[a-zA-Z0-9][-a-zA-Z0-9]{0,61}[a-zA-Z0-9](\.[a-zA-Z]{2,})+$/, message: '请输入有效的域名格式，如 service.scitiger.cn' },
           ]}
-          tooltip="子域名将用于访问租户系统，创建后不可修改"
+          tooltip="子域名将用于访问租户系统，创建后不可修改，格式如：service.scitiger.cn"
         >
-          <Input placeholder="请输入子域名" />
+          <Input placeholder="请输入完整子域名，例如：service.scitiger.cn" />
         </Form.Item>
         
         <Form.Item
@@ -163,6 +163,7 @@ const TenantCreateModal: React.FC<TenantCreateModalProps> = ({
         <Form.Item
           name="logo"
           label="租户Logo"
+          tooltip="只能上传JPG/PNG等图片文件，且大小不超过2MB"
         >
           <Upload
             listType="picture"
@@ -170,6 +171,7 @@ const TenantCreateModal: React.FC<TenantCreateModalProps> = ({
             beforeUpload={beforeUpload}
             onChange={handleChange}
             maxCount={1}
+            accept="image/*"
           >
             <Button icon={<UploadOutlined />}>选择图片</Button>
           </Upload>

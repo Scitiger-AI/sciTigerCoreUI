@@ -48,6 +48,7 @@ export const API_ENDPOINTS = {
     CREATE: '/api/management/auth/permissions/',
     UPDATE: (permissionId: string) => `/api/management/auth/permissions/${permissionId}/`,
     DELETE: (permissionId: string) => `/api/management/auth/permissions/${permissionId}/`,
+    IMPORT_DEFAULT: '/api/management/auth/permissions/import_default/',
   },
   // API密钥相关
   API_KEY: {
@@ -69,6 +70,32 @@ export const API_ENDPOINTS = {
     RESOURCES: '/api/management/auth/service-scopes/resources/',
     ACTIONS: '/api/management/auth/service-scopes/actions/',
     ALL: '/api/management/auth/service-scopes/all/',
+  },
+  // 服务管理
+  SERVICE: {
+    LIST: '/api/management/auth/services/',
+    DETAIL: (serviceId: string) => `/api/management/auth/services/${serviceId}/`,
+    CREATE: '/api/management/auth/services/',
+    UPDATE: (serviceId: string) => `/api/management/auth/services/${serviceId}/`,
+    DELETE: (serviceId: string) => `/api/management/auth/services/${serviceId}/`,
+    IMPORT_DEFAULT: '/api/management/auth/services/import_default/',
+  },
+  // 资源管理
+  RESOURCE: {
+    LIST: '/api/management/auth/resources/',
+    DETAIL: (resourceId: string) => `/api/management/auth/resources/${resourceId}/`,
+    CREATE: '/api/management/auth/resources/',
+    UPDATE: (resourceId: string) => `/api/management/auth/resources/${resourceId}/`,
+    DELETE: (resourceId: string) => `/api/management/auth/resources/${resourceId}/`,
+    BY_SERVICE: '/api/management/auth/resources/by_service/',
+  },
+  // 操作管理
+  ACTION: {
+    LIST: '/api/management/auth/actions/',
+    DETAIL: (actionId: string) => `/api/management/auth/actions/${actionId}/`,
+    CREATE: '/api/management/auth/actions/',
+    UPDATE: (actionId: string) => `/api/management/auth/actions/${actionId}/`,
+    DELETE: (actionId: string) => `/api/management/auth/actions/${actionId}/`,
   },
   // 租户相关
   TENANT: {
