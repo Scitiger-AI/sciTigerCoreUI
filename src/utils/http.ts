@@ -200,69 +200,46 @@ http.interceptors.response.use(
     const errorResponse = error.response?.data;
     const errorMessage = errorResponse?.message || '请求失败，请稍后重试';
     
-    // 特殊处理400错误（数据源连接错误等常见业务逻辑错误）
-    if (status === 400) {
-      // 创建一个普通对象而不是Error实例，避免控制台错误
-      const errorObj: {
-        message: string;
-        response?: typeof error.response;
-        status?: number;
-        data?: typeof errorResponse;
-        isHttpError: boolean;
-        inactive?: boolean;
-        results?: any;
-        connectionError?: string;
-      } = {
-        message: errorMessage,
-        response: error.response,
-        status: status,
-        data: errorResponse,
-        isHttpError: true
-      };
-      
-      // 处理特殊情况，如数据源连接错误
-      if (errorResponse && typeof errorResponse === 'object') {
-        // 添加特殊标记，如账号未激活
-        if ('inactive' in errorResponse) {
-          errorObj.inactive = !!errorResponse.inactive;
-        }
-        
-        // 处理数据源相关错误
-        if ('results' in errorResponse && errorResponse.results) {
-          errorObj.results = errorResponse.results;
-          
-          // 数据源连接错误
-          if (typeof errorResponse.results === 'object' && 'connection_error' in errorResponse.results) {
-            errorObj.connectionError = errorResponse.results.connection_error;
-          }
-        }
-      }
-      
-      // 记录错误但不使用console.error
-      console.log('请求返回400错误:', errorObj.message);
-      
-      return Promise.reject(errorObj);
-    }
-
-    // 处理其他错误
-    // 创建一个增强的错误对象，包含原始响应数据
-    const enhancedError = new Error(errorMessage) as Error & {
+    // 统一的错误处理：为所有HTTP错误创建普通对象而不是Error实例，避免控制台错误
+    const errorObj: {
+      message: string;
       response?: typeof error.response;
       status?: number;
       data?: typeof errorResponse;
+      isHttpError: boolean;
       inactive?: boolean;
+      results?: any;
+      connectionError?: string;
+    } = {
+      message: errorMessage,
+      response: error.response,
+      status: status,
+      data: errorResponse,
+      isHttpError: true
     };
     
-    enhancedError.response = error.response;
-    enhancedError.status = status;
-    enhancedError.data = errorResponse;
-    
-    // 添加特殊标记，如账号未激活
-    if (errorResponse && typeof errorResponse === 'object' && 'inactive' in errorResponse) {
-      enhancedError.inactive = !!errorResponse.inactive;
+    // 处理特殊情况，如数据源连接错误、账号未激活等
+    if (errorResponse && typeof errorResponse === 'object') {
+      // 添加特殊标记，如账号未激活
+      if ('inactive' in errorResponse) {
+        errorObj.inactive = !!errorResponse.inactive;
+      }
+      
+      // 处理数据源相关错误
+      if ('results' in errorResponse && errorResponse.results) {
+        errorObj.results = errorResponse.results;
+        
+        // 数据源连接错误
+        if (typeof errorResponse.results === 'object' && 'connection_error' in errorResponse.results) {
+          errorObj.connectionError = errorResponse.results.connection_error;
+        }
+      }
     }
     
-    return Promise.reject(enhancedError);
+    // 记录错误信息但不使用console.error，避免在控制台显示错误堆栈
+    console.log(`请求返回${status}错误:`, errorObj.message);
+    
+    return Promise.reject(errorObj);
   }
 );
 

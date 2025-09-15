@@ -141,4 +141,5 @@ export const STORAGE_KEYS = {
   REFRESH_TOKEN: 'scitiger_refresh_token',
   USER_INFO: 'scitiger_user_info',
   SESSION_ID: 'scitiger_session_id',
+  AUTH_SYNC_NEEDED: 'scitiger_auth_sync_needed',
 }; 

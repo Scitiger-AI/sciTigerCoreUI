@@ -115,13 +115,12 @@ export const clearAuthStorage = (): void => {
   localStorage.removeItem(STORAGE_KEYS.USER_INFO);
   localStorage.removeItem(STORAGE_KEYS.SESSION_ID);
   
-  // 清除cookies中的认证数据，使用与STORAGE_KEYS相同的键名
+  // 清除cookies中的认证数据
   if (typeof document !== 'undefined') {
     document.cookie = `${STORAGE_KEYS.ACCESS_TOKEN}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/;SameSite=Lax`;
     document.cookie = `${STORAGE_KEYS.REFRESH_TOKEN}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/;SameSite=Lax`;
-    // 同时清除旧的键名，确保兼容性
-    document.cookie = 'access_token=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/;SameSite=Lax';
-    document.cookie = 'refresh_token=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/;SameSite=Lax';
+    document.cookie = `${STORAGE_KEYS.SESSION_ID}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/;SameSite=Lax`;
+    document.cookie = `${STORAGE_KEYS.AUTH_SYNC_NEEDED}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/;SameSite=Lax`;
   }
 };
 
@@ -137,10 +136,6 @@ export const getAccessTokenFromCookie = (): string | null => {
     const cookie = cookies[i].trim();
     if (cookie.startsWith(`${STORAGE_KEYS.ACCESS_TOKEN}=`)) {
       return cookie.substring(STORAGE_KEYS.ACCESS_TOKEN.length + 1);
-    }
-    // 兼容旧版本
-    if (cookie.startsWith('access_token=')) {
-      return cookie.substring('access_token='.length);
     }
   }
   return null;
@@ -158,10 +153,6 @@ export const getRefreshTokenFromCookie = (): string | null => {
     const cookie = cookies[i].trim();
     if (cookie.startsWith(`${STORAGE_KEYS.REFRESH_TOKEN}=`)) {
       return cookie.substring(STORAGE_KEYS.REFRESH_TOKEN.length + 1);
-    }
-    // 兼容旧版本
-    if (cookie.startsWith('refresh_token=')) {
-      return cookie.substring('refresh_token='.length);
     }
   }
   return null;
@@ -190,8 +181,8 @@ export const getSessionIdFromCookies = (): string | null => {
   const cookies = document.cookie.split(';');
   for (let i = 0; i < cookies.length; i++) {
     const cookie = cookies[i].trim();
-    if (cookie.startsWith('sessionId=')) {
-      return cookie.substring('sessionId='.length);
+    if (cookie.startsWith(`${STORAGE_KEYS.SESSION_ID}=`)) {
+      return cookie.substring(STORAGE_KEYS.SESSION_ID.length + 1);
     }
   }
   return null;
@@ -208,7 +199,7 @@ export const setSessionIdInCookies = (sessionId: string, expiresInDays = 1): voi
   const d = new Date();
   d.setTime(d.getTime() + (expiresInDays * 24 * 60 * 60 * 1000));
   const expires = `expires=${d.toUTCString()}`;
-  document.cookie = `sessionId=${sessionId};${expires};path=/;SameSite=Strict`;
+  document.cookie = `${STORAGE_KEYS.SESSION_ID}=${sessionId};${expires};path=/;SameSite=Strict`;
 };
 
 /**
@@ -218,5 +209,5 @@ export const clearSessionIdFromCookies = (): void => {
   if (typeof document === 'undefined') return;
   
   // 设置过期时间为过去，使cookie立即失效
-  document.cookie = 'sessionId=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/;SameSite=Strict';
+  document.cookie = `${STORAGE_KEYS.SESSION_ID}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/;SameSite=Strict`;
 }; 

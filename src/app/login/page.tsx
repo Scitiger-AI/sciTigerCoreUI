@@ -1,6 +1,6 @@
 "use client";
 
-import React, { Suspense, useEffect, useState } from 'react';
+import React, { Suspense, useEffect, useState, useRef } from 'react';
 import { LoginForm } from '@/components/auth/LoginForm';
 import { Card, Typography, Alert, Spin } from 'antd';
 import { css } from '@emotion/css';
@@ -42,8 +42,18 @@ function LoginContent() {
   const searchParams = useSearchParams();
   const [redirectPath, setRedirectPath] = useState<string | null>(null);
   const [redirectDisplay, setRedirectDisplay] = useState<string>('');
-  const { isLoggedIn, isLoading } = useAuth();
+  const { isLoggedIn, isLoading, isInitializing } = useAuth();
   const router = useRouter();
+  const hasRedirectedRef = useRef(false);
+  
+  // 添加整体状态日志
+  console.log('📊 LoginContent 渲染状态:', {
+    isLoggedIn,
+    isLoading,
+    isInitializing,
+    redirectPath,
+    timestamp: new Date().toISOString()
+  });
 
   useEffect(() => {
     const from = searchParams.get('from');
@@ -66,14 +76,42 @@ function LoginContent() {
 
   // 如果用户已登录，重定向到首页
   useEffect(() => {
-    if (!isLoading && isLoggedIn) {
+    console.log('🔄 登录页面跳转检查:', {
+      isInitializing,
+      isLoading,
+      isLoggedIn,
+      redirectPath,
+      hasRedirected: hasRedirectedRef.current,
+      shouldRedirect: !isInitializing && !isLoading && isLoggedIn && !hasRedirectedRef.current
+    });
+    
+    if (!isInitializing && !isLoading && isLoggedIn && !hasRedirectedRef.current) {
       const redirectTo = redirectPath || '/';
-      router.push(redirectTo);
+      console.log(`🚀 准备跳转到: ${redirectTo}`);
+      
+      // 标记已经跳转过，防止重复跳转
+      hasRedirectedRef.current = true;
+      
+      try {
+        console.log('🔍 路由器状态:', { router, routerType: typeof router });
+        router.push(redirectTo);
+        console.log(`✅ router.push(${redirectTo}) 已调用`);
+        
+        // 添加延迟检查，看看是否真的跳转了
+        setTimeout(() => {
+          console.log('⏰ 3秒后检查：当前路径 =', window.location.pathname);
+        }, 3000);
+      } catch (error) {
+        console.error('❌ 路由跳转失败:', error);
+        // 如果跳转失败，重置标记
+        hasRedirectedRef.current = false;
+      }
     }
-  }, [isLoggedIn, isLoading, redirectPath, router]);
+  }, [isLoggedIn, isLoading, isInitializing, redirectPath]);
 
-  // 如果正在加载或已登录，显示加载中
-  if (isLoading || isLoggedIn) {
+  // 如果正在初始化，显示加载界面
+  if (isInitializing) {
+    console.log('🔄 显示初始化界面 - isInitializing:', isInitializing);
     return (
       <div className={css`
         display: flex;
@@ -83,7 +121,36 @@ function LoginContent() {
       `}>
         <Spin size="large">
           <div style={{ padding: '50px', textAlign: 'center' }}>
-            <div style={{ marginTop: '20px', color: 'rgba(0, 0, 0, 0.45)' }}>正在加载...</div>
+            <div style={{ marginTop: '20px', color: 'rgba(0, 0, 0, 0.45)' }}>
+              正在检查登录状态...
+            </div>
+          </div>
+        </Spin>
+      </div>
+    );
+  }
+
+  // 如果已登录且没有在处理其他请求，显示跳转提示
+  if (isLoggedIn && !isLoading) {
+    console.log('🎯 显示跳转提示界面:', {
+      isLoggedIn,
+      isLoading,
+      isInitializing,
+      redirectPath: redirectPath || '/',
+      timestamp: new Date().toISOString()
+    });
+    return (
+      <div className={css`
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+      `}>
+        <Spin size="large">
+          <div style={{ padding: '50px', textAlign: 'center' }}>
+            <div style={{ marginTop: '20px', color: 'rgba(0, 0, 0, 0.45)' }}>
+              登录成功，正在跳转...
+            </div>
           </div>
         </Spin>
       </div>

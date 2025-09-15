@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { Spin } from 'antd';
 import { css } from '@emotion/css';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface LoadingScreenProps {
   children: React.ReactNode;
@@ -10,15 +11,24 @@ interface LoadingScreenProps {
 
 const LoadingScreen: React.FC<LoadingScreenProps> = ({ children }) => {
   const [loading, setLoading] = useState(true);
+  const [minDelayPassed, setMinDelayPassed] = useState(false);
+  const { isInitializing } = useAuth();
 
   useEffect(() => {
-    // 在组件挂载后，设置一个短暂的延迟，然后隐藏加载屏幕
-    const timer = setTimeout(() => {
-      setLoading(false);
-    }, 300); // 300ms 通常足够让样式加载完成
+    // 设置最小延迟，确保页面样式加载完成
+    const minDelayTimer = setTimeout(() => {
+      setMinDelayPassed(true);
+    }, 150); // 减少最小延迟到150ms
 
-    return () => clearTimeout(timer);
+    return () => clearTimeout(minDelayTimer);
   }, []);
+
+  useEffect(() => {
+    // 只有当最小延迟过去且AuthContext初始化完成时才隐藏加载屏幕
+    if (minDelayPassed && !isInitializing) {
+      setLoading(false);
+    }
+  }, [minDelayPassed, isInitializing]);
 
   return (
     <>

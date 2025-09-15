@@ -29,8 +29,33 @@ export interface ErrorInfo {
  * @returns 格式化的错误信息
  */
 export const handleApiError = (error: any): ErrorInfo => {
-  // 处理增强的错误对象
-  if (error.data) {
+  // 处理 HTTP 拦截器返回的错误对象（新格式）
+  if (error.isHttpError && error.data) {
+    const statusCode = error.status;
+    const message = error.data.message || error.message || '请求失败，请稍后重试';
+    const isInactive = error.inactive || error.data.inactive || false;
+    
+    // 根据状态码确定错误类型
+    let type = ErrorType.UNKNOWN;
+    if (statusCode) {
+      if (statusCode === 400) type = ErrorType.VALIDATION;
+      else if (statusCode === 401) type = ErrorType.AUTHENTICATION;
+      else if (statusCode === 403) type = ErrorType.AUTHORIZATION;
+      else if (statusCode === 404) type = ErrorType.NOT_FOUND;
+      else if (statusCode >= 500) type = ErrorType.SERVER_ERROR;
+    }
+    
+    return {
+      type,
+      message,
+      details: error.data,
+      statusCode,
+      isInactive,
+    };
+  }
+  
+  // 处理旧格式的增强错误对象（向后兼容）
+  if (error.data && !error.isHttpError) {
     const statusCode = error.status;
     const message = error.data.message || '请求失败，请稍后重试';
     const isInactive = error.data.inactive || false;

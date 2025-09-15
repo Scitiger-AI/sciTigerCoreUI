@@ -16,21 +16,21 @@ interface ClientRootLayoutProps {
 
 const ClientRootLayout: React.FC<ClientRootLayoutProps> = ({ children }) => {
   return (
-    <LoadingScreen>
-      <ConfigProvider theme={themeConfig}>
-        <App>
-          <ErrorProvider>
-            <ErrorHandler>
-              <AuthProvider>
-                  <NotificationProvider>
-                    {children}
-                  </NotificationProvider>
-              </AuthProvider>
-            </ErrorHandler>
-          </ErrorProvider>
-        </App>
-      </ConfigProvider>
-    </LoadingScreen>
+    <ConfigProvider theme={themeConfig}>
+      <App>
+        <ErrorProvider>
+          <ErrorHandler>
+            <AuthProvider>
+              <LoadingScreen>
+                <NotificationProvider>
+                  {children}
+                </NotificationProvider>
+              </LoadingScreen>
+            </AuthProvider>
+          </ErrorHandler>
+        </ErrorProvider>
+      </App>
+    </ConfigProvider>
   );
 };
 
